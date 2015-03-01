@@ -1,4 +1,4 @@
-// Coach is a simple package that lets you retry operations
+// Coach lets you retry operations after waiting a given time, unless you decide not to retry.
 package coach
 
 import (
