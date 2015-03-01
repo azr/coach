@@ -29,56 +29,71 @@ func TestRetry(t *testing.T) {
 	}
 }
 
+// Example_retry
+
 var (
-	ExampleErrorOne = errors.New("ExampleError one !")
+	ErrorOne = errors.New("Error one !")
 )
 
-type ExampleErrorTwo interface {
+type ErrorTwoInterface interface {
 	Duration() time.Duration
 }
+type ErrorTooBigInterface interface {
+	TooBig()
+}
 
-type e struct{}
+type MyErrorTwo struct{}
 
-func (_ e) Three() time.Duration {
+func (_ MyErrorTwo) Three() time.Duration {
 	return time.Nanosecond
 }
 
-func (_ e) Error() string {
+func (_ MyErrorTwo) Error() string {
 	return "Two !"
 }
 
-func Example_retry(t *testing.T) {
+type TooBigError struct{}
+
+func (_ TooBigError) TooBig() {}
+
+func (_ TooBigError) Error() string {
+	return "Too BIG !"
+}
+
+func ExampleRetry(t *testing.T) {
 	i := 0
 	op := func() error {
 		j := i
 		i++
 		switch j {
 		case 0:
-			return ExampleErrorOne
+			return ErrorOne // an errors.New("") error
 		case 1:
-			return e{}
+			return MyErrorTwo{} // a special type of error
+		case 2:
+			return TooBigError{} // another special type of error
 		default:
 			return nil
 		}
 	}
 
 	cb := func(err error) (time.Duration, error) {
-		switch err {
-		case ExampleErrorOne:
-			return 0, nil
-		default:
+		if err == ErrorOne {
+			return 0, nil // hah almost false alert !
 		}
 
 		switch e := err.(type) {
-		case ExampleErrorTwo:
-			return e.Duration(), err
+		case ErrorTwoInterface: //Just check if err has a .Duration() method !
+			return e.Duration(), nil
+		case ErrorTooBigInterface: //Just check if err has a .TooBig() method !
+			return 0, err // damn, we can't make it back, let's return the error !
 		default:
 		}
 		return 0, nil
 	}
 
 	err := coach.Retry(op, cb)
-	if _, ok := err.(ExampleErrorTwo); !ok {
-		t.Fatal("err should have been of ExampleErrorTwo type !?")
+	if _, ok := err.(ErrorTooBigInterface); !ok {
+		panic("err should have been of ErrorTooBigInterface type !?")
 	}
 }
