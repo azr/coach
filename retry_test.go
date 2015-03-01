@@ -34,12 +34,15 @@ var (
 )
 
 type ExampleErrorTwo interface {
-	Three()
+	Duration() time.Duration
 }
 
 type e struct{}
 
-func (_ e) Three() {}
+func (_ e) Three() time.Duration {
+	return time.Nanosecond
+}
+
 func (_ e) Error() string {
 	return "Two !"
 }
@@ -68,8 +71,7 @@ func Example_retry(t *testing.T) {
 
 		switch e := err.(type) {
 		case ExampleErrorTwo:
-			e.Three()
-			return 0, err
+			return e.Duration(), err
 		default:
 		}
 		return 0, nil
