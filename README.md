@@ -2,3 +2,5 @@
 Coach is a simple go pkg that lets you retry operations after waiting a given time, unless you decide not to retry
 
 
+# Deprecated
+ I did a much more simple/powerfull one to use here : github.com/azr/coach
