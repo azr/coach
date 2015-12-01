@@ -3,4 +3,4 @@ Coach is a simple go pkg that lets you retry operations after waiting a given ti
 
 
 # Deprecated
- I did a much more simple/powerfull one to use here : [http://github.com/azr/coach](http://github.com/azr/coach)
+ I did a much more simple/powerfull one to use here : [http://github.com/azr/c](http://github.com/azr/retry)
